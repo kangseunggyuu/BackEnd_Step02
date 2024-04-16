@@ -1,4 +1,4 @@
-package org.zerock.w1;
+package org.zerock.springex;
 
 import java.io.*;
 import javax.servlet.http.*;
