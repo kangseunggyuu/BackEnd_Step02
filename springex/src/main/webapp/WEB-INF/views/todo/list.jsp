@@ -60,6 +60,8 @@
                             <div class="mb-3">
                                 <input type="checkbox" name="types" value="t" ${pageRequestDTO.checkType("t")?"checked":""}>제목
                                 <input type="checkbox" name="types" value="w"  ${pageRequestDTO.checkType("w")?"checked":""}>작성자
+<%--                                    <input type="checkbox" name="types" value="t">제목--%>
+<%--                                    <input type="checkbox" name="types" value="w">작성자--%>
                                 <input type="text"  name="keyword" class="form-control" value ='<c:out value="${pageRequestDTO.keyword}"/>' >
                             </div>
                             <div class="input-group mb-3 dueDateDiv">
@@ -98,13 +100,13 @@
                             </tr>
                             </thead>
                             <tbody>
-<%--                            <c:forEach items="${responseDTO.dtoList}" var="dto">--%>
-                            <c:forEach items="${dtoList}" var="dto">
+                            <c:forEach items="${responseDTO.dtoList}" var="dto">
+<%--                            <c:forEach items="${dtoList}" var="dto">--%>
                                 <tr>
                                     <th scope="row"><c:out value="${dto.tno}"/></th>
                                     <td>
-<%--                                        <a href="/todo/read?tno=${dto.tno}&${pageRequestDTO.link}" class="text-decoration-none" data-tno="${dto.tno}" >--%>
-                                        <a href="/todo/read?tno=${dto.tno}" class="text-decoration-none" data-tno="${dto.tno}" >
+                                        <a href="/todo/read?tno=${dto.tno}&${pageRequestDTO.link}" class="text-decoration-none" data-tno="${dto.tno}" >
+<%--                                        <a href="/todo/read?tno=${dto.tno}" class="text-decoration-none" data-tno="${dto.tno}" >--%>
                                             <c:out value="${dto.title}"/>
                                         </a>
                                     </td>
@@ -130,7 +132,8 @@
 
                                 <c:forEach begin="${responseDTO.start}" end="${responseDTO.end}" var="num">
                                     <li class="page-item ${responseDTO.page == num? "active":""} ">
-                                        <a class="page-link"  data-num="${num}">${num}</a></li>
+                                        <a class="page-link"  data-num="${num}">${num}</a>
+                                    </li>
                                 </c:forEach>
 
                                 <c:if test="${responseDTO.next}">
@@ -159,31 +162,48 @@
                                     self.location = `/todo/list?page=\${num}` //백틱(` `)을 이용해서 템플릿 처리
                                 },false)*/
 
+                            /* addEventListener(이벤트이름, 이벤트처리함수, false)
+                                3번째 인자인 false는 '이벤트 버블링'의 의미로
+                                자식에서 이벤트가 발생했을 때 부모는 자식부터 순서대로
+                                동일한 이벤트를 수신한다는 의미이다.
+
+                                '이벤트 버블링'은 자식들에서 일어난 일을 공통으로 처리할 수 있어서
+                                많이 사용된다.
+                            */
+
                             document.querySelector(".pagination").addEventListener("click", function (e) {
                                 e.preventDefault()
                                 e.stopPropagation()
 
-                                const target = e.target
+                                const target = e.target    // 이벤트 발생시킨 주체(자식)
 
-                                if(target.tagName !== 'A') {
+                                // <a></a>  태그에서 발생한 것이 아니라면 무시
+                                if (target.tagName !== 'A') {
                                     return
                                 }
+                                // 해당 자식에서 data-num이라는 사용자 속성값을 추출
                                 const num = target.getAttribute("data-num")
 
                                 const formObj = document.querySelector("form")
 
+                                /*
+                                // 기존 form에 존재하는 parameter(name=value)에 추가로
+                                // page 변수를 더해서 서버로 전송
+                                // /todo/list" "get"요청으로 주소로 전송
+                                 */
                                 formObj.innerHTML += `<input type='hidden' name='page' value='\${num}'>`
 
                                 formObj.submit();
 
-                            },false)
-
+                            }, false)
 
 
                             document.querySelector(".clearBtn").addEventListener("click", function (e){
-                                e.preventDefault()
-                                e.stopPropagation()
+                                e.preventDefault()      // tag에 부여된 html기본동작을 하지 않도록
+                                e.stopPropagation()     // 이벤트 전파를 중지
 
+                                // 아무 값도 전달하지 않으므로 PageRequestDTO에 설정된 default값이 적용된다.
+                                // 그러므로 1페이지, 10개 데이터가 보여진다.
                                 self.location ='/todo/list'
 
                             },false)
